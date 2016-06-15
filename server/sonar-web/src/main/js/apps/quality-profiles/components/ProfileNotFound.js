@@ -18,20 +18,23 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import { IndexLink } from 'react-router';
+import { translate } from '../../../helpers/l10n';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
+export default class ProfileNotFound extends React.Component {
+  render () {
     return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
+        <div className="quality-profile-not-found">
+          <div className="note spacer-bottom">
+            <IndexLink to="/" className="text-muted">
+              {translate('quality_profiles.page')}
+            </IndexLink>
+          </div>
+
+          <div>
+            {translate('quality_profiles.not_found')}
+          </div>
+        </div>
     );
   }
-});
+}

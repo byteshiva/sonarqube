@@ -18,20 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import { translate } from '../../../helpers/l10n';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
+export default class ComparisonEmpty extends React.Component {
+  render () {
     return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
+      <div className="big-spacer-top">
+        {translate('quality_profile.empty_comparison')}
+      </div>
     );
   }
-});
+}

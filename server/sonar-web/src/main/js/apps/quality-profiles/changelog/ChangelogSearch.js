@@ -18,20 +18,32 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import DateInput from '../../../components/controls/DateInput';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
+export default class ChangelogSearch extends React.Component {
+  static propTypes = {
+    fromDate: React.PropTypes.string,
+    toDate: React.PropTypes.string,
+    onFromDateChange: React.PropTypes.func.isRequired,
+    onToDateChange: React.PropTypes.func.isRequired
+  };
+
+  render () {
     return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
+        <div className="display-inline-block"
+             id="quality-profile-changelog-form">
+          <DateInput
+              name="since"
+              value={this.props.fromDate}
+              placeholder="From"
+              onChange={this.props.onFromDateChange}/>
+          {' — '}
+          <DateInput
+              name="since"
+              value={this.props.toDate}
+              placeholder="To"
+              onChange={this.props.onToDateChange}/>
+        </div>
     );
   }
-});
+}

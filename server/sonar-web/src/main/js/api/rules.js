@@ -17,21 +17,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import { getJSON } from '../helpers/request';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
-    return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
-    );
-  }
-});
+export function searchRules (data) {
+  const url = '/api/rules/search';
+  return getJSON(url, data);
+}
+
+export function takeFacet (response, property) {
+  const facet = response.facets.find(facet => facet.property === property);
+  return facet ? facet.values : [];
+}

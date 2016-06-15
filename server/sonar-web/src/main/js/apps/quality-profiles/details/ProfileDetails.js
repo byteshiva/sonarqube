@@ -18,20 +18,28 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import ProfileRules from './ProfileRules';
+import ProfileProjects from './ProfileProjects';
+import ProfileInheritance from './ProfileInheritance';
+import { ProfileType } from '../propTypes';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
+export default class ProfileDetails extends React.Component {
+  static propTypes = {
+    profile: ProfileType,
+    canAdmin: React.PropTypes.bool,
+    updateProfiles: React.PropTypes.func
+  };
+
+  render () {
     return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
+        <div>
+          <div className="quality-profile-grid">
+            <ProfileRules {...this.props}/>
+            <ProfileInheritance {...this.props}/>
+          </div>
+
+          <ProfileProjects {...this.props}/>
+        </div>
     );
   }
-});
+}

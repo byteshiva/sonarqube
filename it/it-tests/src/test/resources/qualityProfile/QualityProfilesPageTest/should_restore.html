@@ -3,30 +3,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <title>user-cannot-administrate-profile</title>
+  <link rel="selenium.base" href="http://localhost:49506"/>
+  <title>should_create</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
-  <tbody>
-  <tr>
+<thead>
+<tr>
+<td rowspan="1" colspan="3">should_create</td>
+</tr>
+</thead>
+<tbody>
+<tr>
 	<td>open</td>
 	<td>/sessions/logout</td>
 	<td></td>
 </tr>
 <tr>
 	<td>open</td>
-	<td>/sessions/new</td>
+	<td>/sessions/login</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>id=login</td>
-	<td>not_profileadm</td>
+	<td>id=password</td>
+	<td>admin</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>id=password</td>
-	<td>userpwd</td>
+	<td>id=login</td>
+	<td>admin</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -40,22 +46,22 @@
 </tr>
 <tr>
 	<td>waitForElementPresent</td>
-	<td>css=.quality-profiles-table-row[data-name=&quot;Basic&quot;]</td>
+	<td>css=#quality-profiles-restore</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>css=.quality-profiles-table-row[data-name=&quot;Basic&quot;] .quality-profiles-table-name a</td>
+	<td>css=#quality-profiles-restore</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForText</td>
-	<td>css=.quality-profile-header</td>
-	<td>*Basic*</td>
+	<td>waitForElementPresent</td>
+	<td>css=#restore-profile-backup</td>
+	<td></td>
 </tr>
 <tr>
-	<td>assertElementNotPresent</td>
-	<td>css=.js-change-parent</td>
+	<td>waitForElementPresent</td>
+	<td>css=#restore-profile-submit</td>
 	<td></td>
 </tr>
 </tbody>

@@ -18,20 +18,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import ProfileDetails from './ProfileDetails';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
-    return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
-    );
+export default class ProfileDetailsContainer extends React.Component {
+  componentWillMount () {
+    document.querySelector('html').classList.add('dashboard-page');
   }
-});
+
+  componentWillUnmount () {
+    document.querySelector('html').classList.remove('dashboard-page');
+  }
+
+  render () {
+    // TODO no key
+    // TODO not found
+
+    const { profiles, location, ...other } = this.props;
+    const { key } = location.query;
+    const profile = profiles.find(profile => profile.key === key);
+    return <ProfileDetails profile={profile} profiles={profiles} {...other}/>;
+  }
+}

@@ -18,20 +18,18 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import React from 'react';
-import SeverityIcon from './severity-icon';
-import { translate } from '../../helpers/l10n';
+import PageHeader from './PageHeader';
+import UsefulInformation from './UsefulInformation';
+import ProfilesList from './ProfilesList';
 
-export default React.createClass({
-  render() {
-    if (!this.props.severity) {
-      return null;
-    }
+export default class HomeContainer extends React.Component {
+  render () {
     return (
-        <span>
-          <SeverityIcon severity={this.props.severity}/>
-          {' '}
-          {translate('severity', this.props.severity)}
-        </span>
+        <div>
+          <PageHeader {...this.props}/>
+          <UsefulInformation {...this.props}/>
+          <ProfilesList {...this.props}/>
+        </div>
     );
   }
-});
+}

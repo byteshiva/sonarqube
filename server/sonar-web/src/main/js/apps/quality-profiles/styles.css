@@ -1,0 +1,65 @@
+.quality-profiles-table {
+  margin-top: 30px;
+}
+
+.quality-profiles-table-name { }
+
+.quality-profiles-table-inheritance {
+  width: 280px;
+}
+
+.quality-profiles-table-projects,
+.quality-profiles-table-rules {
+  width: 120px;
+}
+
+.quality-profiles-list-header {
+  line-height: 24px;
+  margin-bottom: 15px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  background-color: #f3f3f3;
+}
+
+.quality-profile-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.quality-profile-rules,
+.quality-profile-projects,
+.quality-profile-inheritance {
+  padding: 15px 20px 20px;
+  border: 1px solid #e6e6e6;
+  background-color: #fff;
+}
+
+.quality-profile-rules {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.quality-profile-projects {
+  margin-top: 20px;
+}
+
+.quality-profile-inheritance {
+  flex-grow: 1;
+  margin-left: 20px;
+}
+
+.quality-profile-progress-bar {
+  transition: width 0.5s ease;
+  animation: appear 0.5s forwards;
+}
+
+.quality-profile-not-found {
+  padding-top: 100px;
+  text-align: center;
+}
+
+@keyframes appear {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
