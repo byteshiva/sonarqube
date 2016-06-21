@@ -291,7 +291,7 @@ class ProjectController < ApplicationController
     access_denied unless is_admin?(snapshot)
 
     unless params[:version_name].blank?
-      if Event.already_exists(snapshot.id, params[:version_name], EventCategory::KEY_VERSION)
+      if Event.already_exists(snapshot.component_uuid, params[:version_name], EventCategory::KEY_VERSION)
         flash[:error] = message('project_history.version_already_exists', :params => h(params[:version_name]))
       else
         snapshots = find_project_snapshots(snapshot.id)
@@ -354,7 +354,7 @@ class ProjectController < ApplicationController
     not_found("Snapshot not found") unless snapshot
     access_denied unless is_admin?(snapshot)
 
-    if Event.already_exists(snapshot.id, params[:event_name], EventCategory::KEY_OTHER)
+    if Event.already_exists(snapshot.component_uuid, params[:event_name], EventCategory::KEY_OTHER)
       flash[:error] = message('project_history.event_already_exists', :params => h(params[:event_name]))
     else
       snapshots = find_project_snapshots(snapshot.id)
@@ -377,7 +377,7 @@ class ProjectController < ApplicationController
     not_found("Event not found") unless event
     access_denied unless is_admin?(event.resource)
 
-    if Event.already_exists(event.snapshot_id, params[:event_name], EventCategory::KEY_OTHER)
+    if Event.already_exists(event.component_uuid, params[:event_name], EventCategory::KEY_OTHER)
       flash[:error] = message('project_history.event_already_exists', :params => h(event.name))
     else
       events = find_events(event)
