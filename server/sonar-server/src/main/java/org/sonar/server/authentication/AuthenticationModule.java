@@ -40,6 +40,7 @@ public class AuthenticationModule extends Module {
       JwtCsrfVerifier.class,
       AuthLoginAction.class,
       CredentialsAuthenticator.class,
-      RealmAuthenticator.class);
+      RealmAuthenticator.class,
+      BasicAuthenticator.class);
   }
 }

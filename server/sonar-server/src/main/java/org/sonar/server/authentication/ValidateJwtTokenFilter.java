@@ -26,6 +26,7 @@ import static org.sonar.api.web.ServletFilter.UrlPattern.Builder.staticResourceP
 import static org.sonar.server.authentication.AuthLoginAction.AUTH_LOGIN_URL;
 
 import java.io.IOException;
+import java.util.Optional;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -36,19 +37,27 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonar.api.config.Settings;
 import org.sonar.api.server.ServerSide;
 import org.sonar.api.web.ServletFilter;
+import org.sonar.db.DbClient;
+import org.sonar.db.user.UserDto;
 import org.sonar.server.exceptions.UnauthorizedException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ServerUserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 @ServerSide
 public class ValidateJwtTokenFilter extends ServletFilter {
 
+  private final DbClient dbClient;
   private final Settings settings;
   private final JwtHttpHandler jwtHttpHandler;
-  private final UserSession userSession;
+  private final BasicAuthenticator basicAuthenticator;
+  private final ThreadLocalUserSession userSession;
 
-  public ValidateJwtTokenFilter(Settings settings, JwtHttpHandler jwtHttpHandler, UserSession userSession) {
+  public ValidateJwtTokenFilter(DbClient dbClient, Settings settings, JwtHttpHandler jwtHttpHandler, BasicAuthenticator basicAuthenticator,
+    ThreadLocalUserSession userSession) {
+    this.dbClient = dbClient;
     this.settings = settings;
     this.jwtHttpHandler = jwtHttpHandler;
+    this.basicAuthenticator = basicAuthenticator;
     this.userSession = userSession;
   }
 
@@ -67,8 +76,7 @@ public class ValidateJwtTokenFilter extends ServletFilter {
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
     try {
-      jwtHttpHandler.validateToken(request, response);
-      // TODO handle basic authentication
+      authenticate(request, response);
       if (!userSession.isLoggedIn() && settings.getBoolean(CORE_FORCE_AUTHENTICATION_PROPERTY)) {
         throw new UnauthorizedException("User must be authenticated");
       }
@@ -78,6 +86,19 @@ public class ValidateJwtTokenFilter extends ServletFilter {
     } finally {
       chain.doFilter(request, response);
     }
+  }
+
+  // Try first to authenticate from JWT token, then try from basic http header
+  private void authenticate(HttpServletRequest request, HttpServletResponse response) {
+    jwtHttpHandler.validateToken(request, response);
+    if (userSession.isLoggedIn()) {
+      return;
+    }
+    Optional<UserDto> userDto = basicAuthenticator.authenticate(request);
+    if (!userDto.isPresent()) {
+      return;
+    }
+    userSession.set(ServerUserSession.createForUser(dbClient, userDto.get()));
   }
 
   @Override
