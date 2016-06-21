@@ -21,33 +21,35 @@
 package org.sonar.server.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.junit.Rule;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
 import org.sonar.server.exceptions.UnauthorizedException;
-import org.sonar.server.tester.UserSessionRule;
+import org.sonar.server.user.UserSession;
 
 public class ValidateJwtTokenFilterTest {
 
-  @Rule
-  public UserSessionRule userSession = UserSessionRule.standalone();
+  UserSession userSession = mock(UserSession.class);
 
   HttpServletRequest request = mock(HttpServletRequest.class);
   HttpServletResponse response = mock(HttpServletResponse.class);
   FilterChain chain = mock(FilterChain.class);
 
   JwtHttpHandler jwtHttpHandler = mock(JwtHttpHandler.class);
+  BasicAuthenticator basicAuthenticator = mock(BasicAuthenticator.class);
 
   Settings settings = new Settings();
 
-  ValidateJwtTokenFilter underTest = new ValidateJwtTokenFilter(settings, jwtHttpHandler, userSession);
+  ValidateJwtTokenFilter underTest = new ValidateJwtTokenFilter(settings, jwtHttpHandler, basicAuthenticator, userSession);
 
   @Test
   public void do_get_pattern() throws Exception {
@@ -64,17 +66,28 @@ public class ValidateJwtTokenFilterTest {
   }
 
   @Test
-  public void validate_session() throws Exception {
-    userSession.login("john");
+  public void validate_session_from_token() throws Exception {
+    when(userSession.isLoggedIn()).thenReturn(true);
     underTest.doFilter(request, response, chain);
 
     verify(jwtHttpHandler).validateToken(request, response);
+    verify(response, never()).setStatus(anyInt());
+    verify(chain).doFilter(request, response);
+  }
+
+  @Test
+  public void validate_session_from_basic_authentication() throws Exception {
+    when(userSession.isLoggedIn()).thenReturn(false).thenReturn(true);
+    underTest.doFilter(request, response, chain);
+
+    verify(jwtHttpHandler).validateToken(request, response);
+    verify(basicAuthenticator).authenticate(request, response);
+    verify(response, never()).setStatus(anyInt());
     verify(chain).doFilter(request, response);
   }
 
   @Test
   public void return_code_401_when_invalid_token_exception() throws Exception {
-    userSession.login("john");
     doThrow(new UnauthorizedException("invalid token")).when(jwtHttpHandler).validateToken(request, response);
 
     underTest.doFilter(request, response, chain);
@@ -85,8 +98,8 @@ public class ValidateJwtTokenFilterTest {
 
   @Test
   public void return_code_401_when_not_authenticated_and_with_force_authentication() throws Exception {
+    when(userSession.isLoggedIn()).thenReturn(false);
     settings.setProperty("sonar.forceAuthentication", true);
-    userSession.anonymous();
 
     underTest.doFilter(request, response, chain);
 

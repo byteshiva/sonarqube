@@ -8,7 +8,7 @@ module AuthenticatedSystem
   # Accesses the current user from the session.
   # Future calls avoid the database because nil is not equal to false.
   def current_user
-    @current_user ||= (login_from_java_user_session || login_from_basic_auth) unless @current_user == false
+    @current_user ||= login_from_java_user_session unless @current_user == false
   end
 
   # Store the given user

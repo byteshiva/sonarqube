@@ -43,11 +43,13 @@ public class ValidateJwtTokenFilter extends ServletFilter {
 
   private final Settings settings;
   private final JwtHttpHandler jwtHttpHandler;
+  private final BasicAuthenticator basicAuthenticator;
   private final UserSession userSession;
 
-  public ValidateJwtTokenFilter(Settings settings, JwtHttpHandler jwtHttpHandler, UserSession userSession) {
+  public ValidateJwtTokenFilter(Settings settings, JwtHttpHandler jwtHttpHandler, BasicAuthenticator basicAuthenticator, UserSession userSession) {
     this.settings = settings;
     this.jwtHttpHandler = jwtHttpHandler;
+    this.basicAuthenticator = basicAuthenticator;
     this.userSession = userSession;
   }
 
@@ -66,8 +68,7 @@ public class ValidateJwtTokenFilter extends ServletFilter {
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
     try {
-      jwtHttpHandler.validateToken(request, response);
-      // TODO handle basic authentication
+      authenticate(request, response);
       if (!userSession.isLoggedIn() && settings.getBoolean(CORE_FORCE_AUTHENTICATION_PROPERTY)) {
         throw new UnauthorizedException("User must be authenticated");
       }
@@ -76,6 +77,14 @@ public class ValidateJwtTokenFilter extends ServletFilter {
       response.setStatus(HTTP_UNAUTHORIZED);
     } finally {
       chain.doFilter(request, response);
+    }
+  }
+
+  // Try first to authenticate from JWT token, then try from basic http header
+  private void authenticate(HttpServletRequest request, HttpServletResponse response){
+    jwtHttpHandler.validateToken(request, response);
+    if (!userSession.isLoggedIn()){
+      basicAuthenticator.authenticate(request, response);
     }
   }
 
