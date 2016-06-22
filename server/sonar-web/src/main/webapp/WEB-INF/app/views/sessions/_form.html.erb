@@ -22,7 +22,7 @@
 <form id="login_form" action="<%= ApplicationController.root_context -%>/api/authentication/login" method="post">
   <input type="hidden" name="return_to_anchor" value="<%= h @return_to_anchor %>">
 
-  <div class="alert alert-danger hidden"><%= message('session.flash_notice.authentication_failed') %></div>
+  <div class="alert alert-danger hidden">++++++ <%= message('session.flash_notice.authentication_failed') %></div>
 
   <div class="big-spacer-bottom">
     <label for="login" class="login-label"><%= message('login') %></label>
@@ -42,8 +42,7 @@
   </p>
 
   <div>
-    <div class="text-right overflow-hidden">
-      <button name="commit"><%= message('sessions.log_in') -%></button>
+    <div class="text-right overflow-hidden js-submit">
       <a class="spacer-left" href="<%= home_path -%>"><%= message('cancel') -%></a>
     </div>
   </div>
@@ -58,12 +57,41 @@
     }
   })(window.jQuery);
 
-  $j("#login_form").modalForm({
-    success: function () {
-      window.location = '<%= ApplicationController.root_context + h(@return_to) -%>' + $j('[name="return_to_anchor"]').val();
-    },
-    error: function () {
-      jQuery('.alert').removeClass('hidden');
-    }
-  });
+  //$j("#login_form").modalForm({
+  //  success: function () {
+//      jQuery('.alert').removeClass('hidden').text('hello');
+//      window.location = '<%= ApplicationController.root_context + h(@return_to) -%>' + $j('[name="return_to_anchor"]').val();
+//    },
+//    error: function (xhr) {
+//      jQuery('.alert').removeClass('hidden').text(xhr.status + ' ' + xhr.statusText + ' ' + xhr.responseText);
+//    }
+//  });
+
+  setTimeout(function () {
+    jQuery('.js-submit').prepend('<button name="commit"><%= message("sessions.log_in") -%></button>');
+  }, 2000);
 </script>
+
+<% content_for :extra_script do %>
+  <script>
+    window.sonarqube.appStarted.then(function () {
+        var form = document.querySelector('form');
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          window.SonarRequest.post(window.baseUrl + '/api/authentication/login', {
+            login: document.getElementById('login').value,
+            password: document.getElementById('password').value
+          }).then(function () {
+            window.location = '<%= ApplicationController.root_context + h(@return_to) -%>';
+          })
+          .catch(function (e) {
+            var xhr = e.response;
+            var alert = document.querySelector('.alert');
+            alert.classList.remove('hidden');
+            alert.textContent = xhr.status + ' ' + xhr.statusText;
+          });
+        });
+      });
+  </script>
+<% end %>
